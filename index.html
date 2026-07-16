@@ -2,10 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121212">
+    
     <title>Solar Invest - Calculadora de Desconto</title>
     <style>
-        /* CSS Reset e Configurações Globais */
         :root {
             --bg-primary: #121212;
             --bg-secondary: #1a1a1a;
@@ -14,8 +18,8 @@
             --green-primary: #38b000;
             --green-neon: #aacc00;
             --gold-primary: #fca311;
-            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            --border-radius: 20px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            --border-radius: 16px;
             --transition: all 0.3s ease;
         }
 
@@ -24,503 +28,160 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        /* Bloqueio de Scroll e Altura Dinâmica (Nativo) */
+        html, body {
+            height: 100%;
+            height: 100dvh; 
+            overflow: hidden;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             display: flex;
+            justify-content: center;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            display: flex;
             flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
+            justify-content: space-between; /* Distribui os elementos ocupando 100% da tela */
+            padding: 4vh 5vw;
             background: linear-gradient(135deg, var(--bg-primary) 0%, #1c1c1c 100%);
         }
 
-        /* Container Principal (Mobile First) */
-        .page-wrapper {
-            width: 100%;
-            max-width: 480px; /* Largura típica de celular de ponta a ponta */
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            padding-bottom: 50px;
-        }
-
-        /* Responsividade para Tablets e Computadores */
-        @media (min-width: 768px) {
-            .page-wrapper {
-                max-width: 600px;
-                padding: 40px;
-            }
-        }
-
-        /* Cabeçalho */
+        /* Header Condensado */
         header {
             text-align: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
-
         .logo-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
         }
+        .logo-text { font-size: 1.5rem; font-weight: 700; }
+        .logo-text span { color: var(--green-neon); }
+        .hero-title { font-size: 1.2rem; font-weight: 600; color: var(--text-secondary); }
 
-        .logo-icon {
-            font-size: 2rem;
-            color: var(--gold-primary);
-        }
-
-        .logo-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-transform: uppercase;
-        }
-
-        .logo-text span {
-            color: var(--green-neon);
-        }
-
-        .slogan {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        /* Hero Section */
-        .hero-section {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: relative;
-        }
-
-        .hero-title {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.2;
-            background: linear-gradient(to right, var(--text-primary), var(--green-neon));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-title span {
-            display: block;
-        }
-
-        .hero-text {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            padding: 0 10px;
-        }
-
-        .hero-image-placeholder {
-            width: 100px;
-            height: 120px;
-            margin: 20px auto;
-            background: rgba(56, 176, 0, 0.1);
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: var(--green-neon);
-            box-shadow: 0 0 40px rgba(170, 204, 0, 0.3);
-            border: 2px solid rgba(170, 204, 0, 0.2);
-        }
-
-        /* Seção da Calculadora (Input) */
+        /* Input Section */
         .calculator-input-section {
             background-color: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 30px;
+            padding: 3vh 20px;
             box-shadow: var(--box-shadow);
             border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .input-title {
             text-align: center;
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            color: var(--text-primary);
         }
-
+        .input-title { font-size: 1rem; margin-bottom: 15px; color: var(--text-primary); }
+        
         .input-group {
             position: relative;
-            margin-bottom: 10px;
+            width: 100%;
         }
-
-        /* Campo de Input Formatado */
         input#energy-value {
             width: 100%;
-            padding: 20px 25px;
-            padding-left: 60px; /* Espaço para o ícone */
+            padding: 15px 15px 15px 50px;
             font-size: 1.5rem;
-            font-weight: 600;
-            border-radius: 15px;
+            font-weight: 700;
+            border-radius: 12px;
             background-color: #262626;
             color: var(--green-neon);
             border: 1px solid rgba(170, 204, 0, 0.3);
-            transition: var(--transition);
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
-
-        input#energy-value:focus {
-            outline: none;
-            border-color: var(--green-neon);
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 15px rgba(170, 204, 0, 0.3);
-        }
-
+        input#energy-value:focus { outline: none; border-color: var(--green-neon); }
         .calculator-icon {
             position: absolute;
-            left: 20px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.8rem;
-            color: #404040;
-            transition: var(--transition);
-        }
-
-        input#energy-value:focus + .calculator-icon {
-            color: var(--green-neon);
-        }
-
-        .input-helper-text {
-            text-align: center;
-            font-size: 0.8rem;
+            font-size: 1.4rem;
             color: #666;
-            margin-top: 5px;
         }
 
-        /* Seção de Resultados */
+        /* Resultados Lado a Lado (Inovação para economizar espaço vertical) */
         .results-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .results-title {
-            text-align: center;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-        }
-
-        /* Boxes de Resultado (Estilo Imagem) */
-        .result-box {
-            border-radius: var(--border-radius);
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Realce de cor para os boxes */
-        .result-box::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
-            z-index: 1;
-        }
-
-        /* Box Verde (A pagar) */
-        .result-box.green {
-            background-color: var(--bg-secondary);
-            border: 2px solid rgba(56, 176, 0, 0.4);
-        }
-
-        .result-box.green:hover {
-            box-shadow: 0 15px 40px rgba(56, 176, 0, 0.2);
-            transform: translateY(-3px);
-        }
-
-        /* Box Dourado (Economia) */
-        .result-box.gold {
-            background-color: var(--bg-secondary);
-            border: 2px solid rgba(252, 163, 17, 0.4);
-        }
-
-        .result-box.gold:hover {
-            box-shadow: 0 15px 40px rgba(252, 163, 17, 0.2);
-            transform: translateY(-3px);
-        }
-
-        .result-icon-container {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            z-index: 2;
-        }
-
-        .result-box.green .result-icon-container {
-            background: rgba(56, 176, 0, 0.1);
-            color: var(--green-neon);
-            border: 1px solid rgba(170, 204, 0, 0.2);
-        }
-
-        .result-box.gold .result-icon-container {
-            background: rgba(252, 163, 17, 0.1);
-            color: var(--gold-primary);
-            border: 1px solid rgba(252, 163, 17, 0.2);
-        }
-
-        .result-info {
-            flex-grow: 1;
-            text-align: right;
-            z-index: 2;
-        }
-
-        .result-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 5px;
-        }
-
-        .result-box.green .result-label {
-            background: rgba(56, 176, 0, 0.2);
-            color: var(--green-neon);
-        }
-
-        .result-box.gold .result-label {
-            background: rgba(252, 163, 17, 0.2);
-            color: var(--gold-primary);
-        }
-
-        .result-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .result-box.green .result-value {
-            color: var(--green-neon);
-        }
-
-        .result-box.gold .result-value {
-            color: var(--gold-primary);
-        }
-
-        .result-subtext {
-            font-size: 0.85rem;
-            color: #666;
-            margin-top: 3px;
-        }
-
-        /* Divisor de Igualdade */
-        .equality-divider {
-            text-align: center;
-            font-size: 1.5rem;
-            color: #404040;
-            margin: -10px 0;
-            font-weight: 600;
-        }
-
-        /* Seção de Confiança (Ícones e Texto) */
-        .trust-section {
-            background-color: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 25px;
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            box-shadow: var(--box-shadow);
-        }
-
-        @media (min-width: 400px) {
-            .trust-section {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .trust-item {
-            display: flex;
-            align-items: center;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-
-        .trust-icon {
-            font-size: 2rem;
-            color: var(--green-primary);
-        }
-
-        .trust-info {
+        
+        .result-box {
+            border-radius: var(--border-radius);
+            padding: 15px 10px;
+            text-align: center;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--box-shadow);
         }
+        .result-box.green { background-color: rgba(56, 176, 0, 0.1); border: 1px solid rgba(56, 176, 0, 0.3); }
+        .result-box.gold { background-color: rgba(252, 163, 17, 0.1); border: 1px solid rgba(252, 163, 17, 0.3); }
+        
+        .result-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; }
+        .result-box.green .result-label { color: var(--green-neon); }
+        .result-box.gold .result-label { color: var(--gold-primary); }
+        
+        .result-value { font-size: 1.4rem; font-weight: 700; }
+        .result-box.green .result-value { color: var(--green-neon); }
+        .result-box.gold .result-value { color: var(--gold-primary); }
 
-        .trust-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        /* Trust Badges - Estilo App */
+        .trust-section {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 10px;
         }
-
-        .trust-text {
-            font-size: 0.85rem;
-            color: #888;
+        .trust-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-align: center;
         }
+        .trust-icon { font-size: 1.2rem; color: var(--green-primary); }
+        .trust-title { font-size: 0.75rem; font-weight: 600; }
 
-        /* Botão CTA (Grande e Verde) */
+        /* Bottom Fixed CTA */
         .cta-button {
             width: 100%;
             background: linear-gradient(to right, var(--green-primary), var(--green-neon));
             color: #000;
             border: none;
-            padding: 25px;
+            padding: 20px;
             border-radius: var(--border-radius);
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 10px 30px rgba(56, 176, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-button::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(45deg);
-            transition: var(--transition);
-        }
-
-        .cta-button:hover {
-            box-shadow: 0 15px 40px rgba(56, 176, 0, 0.6);
-            transform: translateY(-3px);
-        }
-
-        .cta-button:hover::after {
-            left: 100%;
-        }
-
-        .cta-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .cta-subtext {
-            font-size: 0.85rem;
-            font-weight: 400;
-            margin-top: 3px;
-        }
-
-        .cta-arrow {
-            font-size: 1.4rem;
-        }
-
-        /* Rodapé */
-        footer {
-            padding: 30px 20px;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: auto;
-        }
-
-        .footer-benefits {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 500px) {
-            .footer-benefits {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-        }
-
-        .benefit-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
             gap: 10px;
+            box-shadow: 0 10px 20px rgba(56, 176, 0, 0.3);
+            margin-bottom: 2vh;
         }
 
-        .benefit-icon {
-            font-size: 1.8rem;
-            color: var(--green-neon);
-            background: rgba(56, 176, 0, 0.05);
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: inset 0 0 15px rgba(170, 204, 0, 0.1);
-        }
-
-        .benefit-info {
-            text-align: center;
-        }
-
-        .benefit-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .benefit-text {
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        /* Utilitários */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Font-awesome Icons (Simulados para fins de cópia completa) */
         @font-face {
             font-family: 'FontAwesome';
             src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2') format('woff2');
         }
-        .fa {
-            display: inline-block;
-            font: normal normal normal 14px/1 FontAwesome;
-            font-size: inherit;
-            text-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-        }
+        .fa { display: inline-block; font: normal normal normal 14px/1 FontAwesome; font-size: inherit; }
         .fa-sun-o:before { content: "\f185"; }
-        .fa-bolt:before { content: "\f0e7"; }
-        .fa-percent:before { content: "\f295"; }
         .fa-calculator:before { content: "\f1ec"; }
-        .fa-money:before { content: "\f0d6"; }
-        .fa-circle-thin:before { content: "\f1db"; }
-        .fa-dollar:before { content: "\f155"; }
         .fa-shield:before { content: "\f132"; }
         .fa-check-circle-o:before { content: "\f05d"; }
-        .fa-leaf:before { content: "\f06c"; }
+        .fa-bolt:before { content: "\f0e7"; }
     </style>
 </head>
 <body>
@@ -528,128 +189,56 @@
     <div class="page-wrapper">
         <header>
             <div class="logo-container">
-                <i class="fa fa-sun-o logo-icon"></i>
+                <i class="fa fa-sun-o" style="color: var(--gold-primary); font-size: 1.5rem;"></i>
                 <div class="logo-text">SOLAR <span>INVEST</span></div>
             </div>
-            <p class="slogan">Economize hoje, invista no amanhã.</p>
+            <h1 class="hero-title">Menos conta, mais economia!</h1>
         </header>
 
-        <section class="hero-section">
-            <h1 class="hero-title"><span>Menos conta,</span> <span>mais economia!</span></h1>
-            <p class="hero-text">Adicione o valor da sua conta de energia e veja quanto você economiza ao pagar à vista com desconto.</p>
-            <div class="hero-image-placeholder">
-                <i class="fa fa-bolt"></i>
-            </div>
-        </section>
-
         <section class="calculator-input-section">
-            <h2 class="input-title">Qual o valor da sua conta de energia?</h2>
-            
+            <h2 class="input-title">Valor da conta atual</h2>
             <div class="input-group">
-                <input type="text" id="energy-value" placeholder="R$ 0,00" inputmode="numeric" required>
                 <i class="fa fa-calculator calculator-icon"></i>
+                <input type="text" id="energy-value" placeholder="R$ 0,00" inputmode="numeric">
             </div>
-            <p class="input-helper-text">Digite o valor de sua conta para calcular</p>
         </section>
 
         <section class="results-section">
-            <h2 class="results-title">Com o desconto da Solar Invest:</h2>
-            
             <div class="result-box green">
-                <div class="result-icon-container">
-                    <i class="fa fa-money"></i>
-                </div>
-                <div class="result-info">
-                    <span class="result-label">À vista com desconto</span>
-                    <div class="result-value" id="final-payment">R$ 0,00</div>
-                    <p class="result-subtext">Você paga</p>
-                </div>
+                <span class="result-label">Novo Pagamento</span>
+                <div class="result-value" id="final-payment">R$ 0,00</div>
             </div>
-
-            <div class="equality-divider">=</div>
-
             <div class="result-box gold">
-                <div class="result-icon-container">
-                    <i class="fa fa-dollar"></i>
-                </div>
-                <div class="result-info">
-                    <span class="result-label">Você economiza</span>
-                    <div class="result-value" id="discount-amount">R$ 0,00</div>
-                    <p class="result-subtext">Valor economizado</p>
-                </div>
+                <span class="result-label">Sua Economia</span>
+                <div class="result-value" id="discount-amount">R$ 0,00</div>
             </div>
         </section>
 
         <section class="trust-section">
             <div class="trust-item">
                 <i class="fa fa-shield trust-icon"></i>
-                <div class="trust-info">
-                    <span class="trust-title">Pagamento 100% seguro</span>
-                    <p class="trust-text">Desconto garantido e aprovado.</p>
-                </div>
+                <span class="trust-title">100% Seguro</span>
             </div>
             <div class="trust-item">
                 <i class="fa fa-check-circle-o trust-icon"></i>
-                <div class="trust-info">
-                    <span class="trust-title">+ de 1.000 clientes</span>
-                    <p class="trust-text">Já economizam!</p>
-                </div>
+                <span class="trust-title">+1.000 Clientes</span>
             </div>
         </section>
 
         <button class="cta-button">
-            <div class="cta-info">
-                <span>Quero economizar agora</span>
-                <span class="cta-subtext">Pagar à vista com desconto</span>
-            </div>
-            <i class="fa fa-bolt cta-arrow"></i>
+            Quero economizar agora
+            <i class="fa fa-bolt"></i>
         </button>
     </div>
 
-    <footer>
-        <div class="footer-benefits">
-            <div class="benefit-item">
-                <i class="fa fa-percent benefit-icon"></i>
-                <div class="benefit-info">
-                    <span class="benefit-title">Descontos reais</span>
-                    <p class="benefit-text">Reduza sua conta de energia</p>
-                </div>
-            </div>
-            <div class="benefit-item">
-                <i class="fa fa-shield benefit-icon"></i>
-                <div class="benefit-info">
-                    <span class="benefit-title">Seguro e confiável</span>
-                    <p class="benefit-text">Seus dados protegidos</p>
-                </div>
-            </div>
-            <div class="benefit-item">
-                <i class="fa fa-leaf benefit-icon"></i>
-                <div class="benefit-info">
-                    <span class="benefit-title">Energia que transforma</span>
-                    <p class="benefit-text">Contribua com o futuro</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <script>
-        // Formatação Monetária Brasileira (BRL)
-        const formatCurrency = (value) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        };
+        const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-        // Função para remover formatação e obter valor numérico puro (centavos)
-        const getNumericalValue = (inputString) => {
-            let cleanString = inputString.replace(/\D/g, ''); // Remove tudo que não é número
-            return parseInt(cleanString, 10); // Retorna em centavos
-        };
+        const getNumericalValue = (inputString) => parseInt(inputString.replace(/\D/g, '') || 0, 10);
 
-        // Lógica de Desconto (Faixas solicitadas)
         const calculateDiscountPercentage = (valueInReais) => {
-            if (valueInReais <= 250) return 0.20;       // 20%
-            if (valueInReais <= 400) return 0.25;       // 25%
-            if (valueInReais <= 500) return 0.30;       // 30%
-            // Mantém 30% para valores maiores
+            if (valueInReais <= 250) return 0.20;
+            if (valueInReais <= 400) return 0.25;
             return 0.30; 
         };
 
@@ -657,49 +246,21 @@
         const paymentDisplay = document.getElementById('final-payment');
         const discountDisplay = document.getElementById('discount-amount');
 
-        // Evento de Input (Mascarar e Calcular em tempo real)
         inputField.addEventListener('input', function(e) {
-            let valueCentavos = getNumericalValue(e.target.value);
-            
-            // Corrige valores nulos ou vazios
-            if (isNaN(valueCentavos)) {
-                valueCentavos = 0;
-            }
-
-            // Limita a digitação a um valor razoável (por exemplo, 99.999,99)
-            if (valueCentavos > 9999999) {
-                valueCentavos = 9999999;
-            }
-
-            // Atualiza o valor do input com a máscara em tempo real
+            let valueCentavos = Math.min(getNumericalValue(e.target.value), 9999999);
             const valueReais = valueCentavos / 100;
             e.target.value = formatCurrency(valueReais);
-
-            // Realiza o cálculo
-            updateCalculations(valueReais);
-        });
-
-        const updateCalculations = (originalValue) => {
-            // Se o valor for zero, reseta as exibições
-            if (originalValue <= 0) {
+            
+            if (valueReais <= 0) {
                 paymentDisplay.innerText = formatCurrency(0);
                 discountDisplay.innerText = formatCurrency(0);
                 return;
             }
 
-            const discountPercentage = calculateDiscountPercentage(originalValue);
-            const discountValue = originalValue * discountPercentage;
-            const finalPayment = originalValue - discountValue;
-
-            // Atualiza os boxes de resultado
-            paymentDisplay.innerText = formatCurrency(finalPayment);
+            const discountValue = valueReais * calculateDiscountPercentage(valueReais);
+            paymentDisplay.innerText = formatCurrency(valueReais - discountValue);
             discountDisplay.innerText = formatCurrency(discountValue);
-        };
-
-        // Inicializa os cálculos com zero
-        updateCalculations(0);
-
+        });
     </script>
-
 </body>
 </html>
